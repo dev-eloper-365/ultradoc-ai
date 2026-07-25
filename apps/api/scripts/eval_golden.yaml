@@ -1,0 +1,40 @@
+golden:
+  - document: sample_rate_confirmation.pdf
+    question: "What is the agreed rate for this shipment?"
+    expect_refusal: false
+    expect_contains: ["2,450", "2450"]
+
+  - document: sample_rate_confirmation.pdf
+    question: "Who is the carrier?"
+    expect_refusal: false
+    expect_contains: ["Northbound"]
+
+  - document: sample_rate_confirmation.pdf
+    question: "What is the pickup date and time?"
+    expect_refusal: false
+    expect_contains: ["2026-08-03", "August 3", "08:00"]
+
+  - document: sample_rate_confirmation.pdf
+    question: "What is the total weight of the shipment?"
+    expect_refusal: false
+    expect_contains: ["38,500", "38500"]
+
+  - document: sample_rate_confirmation.pdf
+    question: "Who is the CEO of the shipper company?"
+    expect_refusal: true
+    expect_contains: []
+
+  - document: sample_rate_confirmation.pdf
+    question: "What is the weather forecast for the delivery city?"
+    expect_refusal: true
+    expect_contains: []
+
+  - document: sample_bill_of_lading.txt
+    question: "What is the carrier name?"
+    expect_refusal: false
+    expect_contains: ["Northbound"]
+
+  - document: sample_bill_of_lading.txt
+    question: "What is the agreed rate for this shipment?"
+    expect_refusal: true
+    expect_contains: []

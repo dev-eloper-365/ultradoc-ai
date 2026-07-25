@@ -1,0 +1,319 @@
+@layer theme, base, components, utilities;
+@import "tailwindcss";
+@import "streamdown/styles.css";
+
+@source "../../../src";
+@source "../../../node_modules/streamdown/dist";
+
+@custom-variant dark (&:is(.dark *));
+@plugin "./hero.ts";
+@plugin "tailwindcss-animate";
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui,
+    sans-serif;
+  --font-mono: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, monospace;
+
+  --color-secondary-bg: #1a1a1a;
+  --color-primary-bg: #111111;
+  --color-primary: #00bbff;
+  --color-primary-foreground: #000000;
+
+  --color-background: #111111;
+  --color-foreground: #ffffff;
+  --color-card: #18181b;
+  --color-card-foreground: #ffffff;
+  --color-muted: #27272a;
+  --color-muted-foreground: #a1a1aa;
+
+  --radius: 0.5rem;
+  --border-radius-lg: var(--radius);
+  --border-radius-md: calc(var(--radius) - 2px);
+  --border-radius-sm: calc(var(--radius) - 4px);
+
+  --animate-shine: shine 1s linear infinite;
+  --animate-scale-in: scale-in 0.4s ease-out forwards;
+  --animate-shake: shake 0.7s ease-in-out;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 100%;
+  }
+  100% {
+    background-position: -100%;
+  }
+}
+
+@keyframes scale-in {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+@layer base {
+  :root {
+    --heroui-primary: #00bbff;
+    --heroui-primary-foreground: #000000;
+    --heroui-focus: #00bbff;
+  }
+
+  * {
+    border-color: var(--color-zinc-800);
+  }
+
+  html,
+  body {
+    background: var(--color-primary-bg);
+    color: #fff;
+  }
+
+  ::selection {
+    background: #00364b;
+    color: #0bf;
+  }
+
+  textarea,
+  input {
+    outline: 0 transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    border-radius: 100px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 100px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-zinc-700);
+    border-radius: 100px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-zinc-500);
+    border-radius: 100px;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* iMessage-style chat bubbles, ported from the design system. */
+@layer components {
+  .imessage-bubble {
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    line-height: 24px;
+    position: relative;
+    padding: 16px 20px;
+    max-width: min(70vw, 100%);
+    border-radius: 20px;
+  }
+
+  .imessage-bubble::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 20px;
+    height: 18px;
+  }
+
+  .imessage-grouped-first,
+  .imessage-grouped-last,
+  .imessage-grouped-middle {
+    border-radius: 20px;
+  }
+
+  /* Frosted glass: translucent blurred fill + a soft gradient "edge" ring
+   * drawn by ::after (mask-composite subtracts its padding-box, leaving only
+   * the border-box ring visible) — lighter at the top, darker at the
+   * bottom, like light catching the rim of real glass. Cheaper and more
+   * reliable than an SVG-distortion layer, and doesn't touch the tail
+   * (::before, the speech-bubble pointer) or the text. */
+  .imessage-from-them {
+    background: rgba(39, 39, 42, 0.35);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    align-self: flex-start;
+  }
+
+  .imessage-from-them::before {
+    left: -7px;
+    background-color: rgba(39, 39, 42, 0.35);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    clip-path: path("M 20 0 L 20 2 A 16 16 0 0 1 4 18 L 0 18 L 0 17.54 A 10 10 0 0 0 7 8 L 7 0 Z");
+  }
+
+  .imessage-from-them::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid transparent;
+    background: linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05)) border-box;
+    mask: linear-gradient(black, black) border-box, linear-gradient(black, black) padding-box;
+    -webkit-mask: linear-gradient(black, black) border-box, linear-gradient(black, black)
+      padding-box;
+    mask-composite: subtract;
+    -webkit-mask-composite: xor;
+  }
+
+  .imessage-from-me {
+    color: white;
+    background: #00bbff;
+    align-self: flex-end;
+  }
+
+  .imessage-from-me::before {
+    right: -7px;
+    background-color: #00bbff;
+    clip-path: path(
+      "M 0 0 L 0 2 A 16 16 0 0 0 16 18 L 20 18 L 20 17.54 A 10 10 0 0 1 13 8 L 13 0 Z"
+    );
+  }
+
+  .imessage-grouped-first::before,
+  .imessage-grouped-middle::before {
+    display: none;
+  }
+}
+
+/* Hand-rolled markdown formatting for assistant answers (Streamdown output).
+   Scoped narrowly (no wildcard descendant selectors) so Streamdown's own
+   syntax-highlighted code, links, and table colors aren't clobbered. */
+@layer components {
+  .markdown-content :where(h1, h2, h3, h4, h5, h6) {
+    font-weight: 600;
+    line-height: 1.3;
+    margin-top: 0.75em;
+    margin-bottom: 0.35em;
+  }
+  .markdown-content :where(h1, h2) {
+    font-size: 1.15em;
+  }
+  .markdown-content :where(h3, h4) {
+    font-size: 1.05em;
+  }
+  .markdown-content :where(h1, h2, h3, h4, h5, h6):first-child {
+    margin-top: 0;
+  }
+
+  .markdown-content :where(p) {
+    margin-top: 0.4em;
+    margin-bottom: 0.4em;
+  }
+  .markdown-content :where(p):first-child {
+    margin-top: 0;
+  }
+  .markdown-content :where(p):last-child {
+    margin-bottom: 0;
+  }
+
+  .markdown-content :where(ul, ol) {
+    margin-top: 0.35em;
+    margin-bottom: 0.35em;
+    padding-left: 1.4em;
+  }
+  .markdown-content :where(ul) {
+    list-style-type: disc;
+  }
+  .markdown-content :where(ol) {
+    list-style-type: decimal;
+  }
+  .markdown-content :where(li) {
+    margin-top: 0.15em;
+  }
+  .markdown-content :where(li)::marker {
+    color: var(--color-zinc-500);
+  }
+
+  .markdown-content :where(code) {
+    background: var(--color-zinc-800);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    font-size: 0.9em;
+  }
+  .markdown-content :where(pre) {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    border-radius: var(--radius);
+    overflow-x: auto;
+  }
+  .markdown-content :where(pre code) {
+    background: transparent;
+    padding: 0;
+  }
+
+  .markdown-content :where(blockquote) {
+    margin: 0.5em 0;
+    padding-left: 0.85em;
+    border-left: 3px solid var(--color-zinc-600);
+    color: var(--color-zinc-400);
+    font-style: italic;
+  }
+
+  .markdown-content :where(table) {
+    margin: 0.5em 0;
+    border-collapse: collapse;
+    font-size: 0.92em;
+  }
+  .markdown-content :where(th, td) {
+    border: 1px solid var(--color-zinc-700);
+    padding: 0.35em 0.65em;
+  }
+  .markdown-content :where(thead th) {
+    background: var(--color-zinc-800);
+  }
+  .markdown-content :where(tbody tr):nth-child(even) {
+    background: color-mix(in srgb, var(--color-zinc-800) 50%, transparent);
+  }
+
+  .markdown-content :where(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .markdown-content :where(hr) {
+    border-color: var(--color-zinc-700);
+    margin: 0.75em 0;
+  }
+}

@@ -1,0 +1,69 @@
+[project]
+name = "ultradoc-api"
+version = "0.1.0"
+description = "UltraDoc AI backend — document upload, RAG Q&A with guardrails, and structured extraction."
+readme = "../../README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+  "fastapi[standard]>=0.115.0",
+  "uvicorn[standard]>=0.32.0",
+  "pydantic>=2.9.0",
+  "pydantic-settings>=2.6.0",
+  "python-dotenv>=1.0.1",
+  "loguru>=0.7.2",
+  "langchain-openai>=0.2.0",
+  "langchain-core>=0.3.0",
+  "langchain-text-splitters>=0.3.0",
+  "chromadb>=0.5.20",
+  "fastembed>=0.4.0",
+  "pymupdf>=1.24.0",
+  "python-docx>=1.1.0",
+  "python-multipart>=0.0.12",
+  "pytesseract>=0.3.13",
+  "pillow>=11.0.0",
+]
+
+[dependency-groups]
+dev = [
+  "ruff>=0.7.0",
+  "mypy>=1.13.0",
+  "reportlab>=4.2.0",
+  "pyyaml>=6.0.2",
+  "types-pyyaml>=6.0.2",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [".venv", "__pycache__", ".mypy_cache", ".ruff_cache", ".pytest_cache", "data"]
+
+[tool.ruff.lint]
+select = [
+  "E", "F", "W", "I", "N", "PL", "RUF", "FAST", "B", "A", "C4",
+  "DTZ", "ISC", "RET", "SIM", "PTH", "UP", "LOG",
+]
+ignore = [
+  "COM812", "ISC001", "E501",
+  "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR2004",
+  "B008",   # FastAPI Depends() in default args
+  "A002",   # builtin-shadowing argument names (id, type)
+  "PLW0603", # global statement — used intentionally for lazy-loaded singleton caches
+  "PLC0415", # import not at top-level — legitimate lazy imports to avoid cycles
+  "UP047",  # generic type parameter syntax — TypeVar style kept for consistency
+  "FAST001", # response_model is auto-inferred but explicit is clearer here
+  "FAST002", # Depends()/File() in default args is the standard FastAPI idiom
+]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+disallow_untyped_defs = true
+warn_unused_ignores = true

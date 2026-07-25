@@ -1,0 +1,10 @@
+{
+  "name": "ultradoc-ai",
+  "private": true,
+  "scripts": {
+    "dev:api": "cd apps/api && uv run uvicorn app.main:app --reload --port 8000",
+    "dev:web": "pnpm --dir apps/web dev",
+    "lint": "pnpm --dir apps/web lint && cd apps/api && uv run ruff check .",
+    "type-check": "pnpm --dir apps/web type-check && cd apps/api && uv run mypy app"
+  }
+}

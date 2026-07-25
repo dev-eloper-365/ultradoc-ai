@@ -1,0 +1,19 @@
+[tools]
+python = "3.12"
+node = "24"
+pnpm = "10"
+uv = "latest"
+
+[tasks."dev:api"]
+description = "Run FastAPI backend (port 8000)"
+dir = "apps/api"
+run = "uv run uvicorn app.main:app --reload --port 8000"
+
+[tasks."dev:web"]
+description = "Run Next.js frontend (port 3000)"
+dir = "apps/web"
+run = "pnpm dev"
+
+[tasks.dev]
+description = "Run backend + frontend together"
+depends = ["dev:api", "dev:web"]
