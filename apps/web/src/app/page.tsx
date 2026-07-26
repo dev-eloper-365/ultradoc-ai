@@ -96,7 +96,7 @@ export default function Home() {
       {hasDocuments && !showLoader && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 bg-[url('/backgrounds/glass-slats-4.jpg')] bg-cover bg-center"
+          className="pointer-events-none absolute inset-0 z-0 bg-[url('/backgrounds/glass-slats.webp')] bg-cover bg-center"
         />
       )}
       <div className="relative z-10 flex h-full w-full flex-col gap-2 px-2 py-3 sm:px-4 lg:px-6">
