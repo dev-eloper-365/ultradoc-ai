@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  ConfidenceScore,
   type ConfidenceReason,
+  ConfidenceScore,
   type SourceItem,
 } from "@/features/doc-chat/components/ConfidenceScore";
 import type { AskResponse, ConfidenceTier } from "@/types/api";

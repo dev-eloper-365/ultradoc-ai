@@ -8,7 +8,7 @@ import { useMemo } from "react";
 // globals.css) and gets its own random path baked in as CSS custom
 // properties (--fx0.."STEPS", --fy*, --fs*) via inline style — same visual
 // result, no per-element stylesheet rules.
-const QUANTITY = 26;
+const QUANTITY = 40;
 const STEPS = 16; // keyframe in globals.css has STEPS+1 stops (0%..100%)
 
 // Deterministic per-firefly jitter: same value on server and client render,
@@ -30,8 +30,8 @@ export function Fireflies({ className = "" }: { className?: string }) {
         style[`--fs${step}`] = (seededRandom(seed + 5) * 0.75 + 0.25).toFixed(2);
       }
       style["--fdrift-duration"] = `${(seededRandom(i * 13 + 1) * 10 + 8).toFixed(2)}s`;
-      style["--fflash-duration"] = `${Math.round(seededRandom(i * 17 + 2) * 6000 + 5000)}ms`;
-      style["--fflash-delay"] = `${Math.round(seededRandom(i * 19 + 3) * 8000 + 500)}ms`;
+      style["--fflash-duration"] = `${Math.round(seededRandom(i * 17 + 2) * 2000 + 1600)}ms`;
+      style["--fflash-delay"] = `${Math.round(seededRandom(i * 19 + 3) * 1500)}ms`;
       return style as React.CSSProperties;
     });
   }, []);
@@ -39,7 +39,7 @@ export function Fireflies({ className = "" }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={`pointer-events-none absolute inset-x-0 top-0 overflow-hidden ${className}`}
+      className={`pointer-events-none fixed inset-0 overflow-hidden ${className}`}
     >
       {fireflies.map((style, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: fixed-length decorative array, never reorders

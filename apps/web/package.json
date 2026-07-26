@@ -12,11 +12,16 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@heroui/react": "^2.8.8",
     "@heroui/system": "^2.4.26",
     "@heroui/theme": "^2.4.26",
+    "@mui/icons-material": "^9.2.0",
+    "@mui/material": "^9.2.0",
     "@tanstack/react-query": "^5.62.0",
     "axios": "^1.7.9",
+    "bootstrap-icons": "^1.13.1",
     "clsx": "^2.1.1",
     "gsap": "^3.15.0",
     "lucide-react": "^0.469.0",
@@ -29,6 +34,7 @@
     "streamdown": "^2.5.0",
     "styled-components": "^6.4.4",
     "tailwind-merge": "^2.6.0",
+    "thinking-orbs": "^0.1.1",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

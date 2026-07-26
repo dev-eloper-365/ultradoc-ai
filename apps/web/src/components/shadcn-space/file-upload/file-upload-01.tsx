@@ -335,7 +335,7 @@ const RocketUploadPanel: React.FC<{ children: React.ReactNode; dragActive: boole
       </div>
       <div
         ref={rocketRef}
-        className="group/rocket relative z-30 flex w-full flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-background px-8 pt-10 pb-8"
+        className="group/rocket relative z-30 flex w-full flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-black px-8 pt-10 pb-8"
         onPointerEnter={launch}
         onPointerLeave={() => {
           if (!dragActive) settle();

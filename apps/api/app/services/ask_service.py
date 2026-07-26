@@ -24,7 +24,7 @@ from app.constants.rag import (
     REFUSAL_MESSAGE,
 )
 from app.guardrails.grounding import check_grounding
-from app.llm.client import ainvoke_llm
+from app.llm.client import ainvoke_llm, friendly_llm_error_message
 from app.rag import documents
 from app.rag.retrieval import RetrievedChunk, retrieve
 from app.schemas.ask import (
@@ -242,9 +242,17 @@ async def _retrieve_and_answer(
         return _refusal_response(model=model_name, retrieval_score=top_score), chunks
 
     prompt = _build_prompt(question, chunks, history)
-    response = await ainvoke_llm(
-        [{"role": "system", "content": _SYSTEM_PROMPT}, {"role": "user", "content": prompt}]
-    )
+    try:
+        response = await ainvoke_llm(
+            [{"role": "system", "content": _SYSTEM_PROMPT}, {"role": "user", "content": prompt}]
+        )
+    except Exception as error:
+        raise create_error(
+            message=friendly_llm_error_message(error),
+            why="The LLM provider request failed",
+            fix="Wait a moment and try again",
+            status_code=503,
+        ) from error
     answer = str(response.content).strip()
 
     # Guardrail 2: the model itself declines when context doesn't answer.

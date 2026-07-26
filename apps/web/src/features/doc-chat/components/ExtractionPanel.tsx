@@ -1,9 +1,8 @@
 "use client";
 
 import { AlertTriangle, Calendar, Copy, FileText, Loader2, MapPin, Truck } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import DotBackgroundDemo from "@/components/ui/dot-background-demo";
 import { useExtractShipments } from "@/features/doc-chat/hooks/useExtractShipments";
 import { useDocStore } from "@/features/doc-chat/stores/docStore";
 import type { ShipmentExtraction, UploadResponse } from "@/types/api";
@@ -67,7 +66,10 @@ function ShipmentCard({ data }: { data: ShipmentExtraction }) {
 
       <div className="mb-3 grid grid-cols-2 gap-2 border-t border-zinc-800 pt-3">
         {stats.map(([label, value]) => (
-          <div key={label} className="rounded-lg bg-zinc-800/60 px-2.5 py-2 backdrop-blur-md">
+          <div
+            key={label}
+            className="rounded-lg border border-white/5 bg-white/[0.03] px-2.5 py-2 backdrop-blur-xl"
+          >
             <p className="mb-0.5 text-[11px] text-zinc-500">{label}</p>
             <p className="truncate text-xs font-medium text-white">{value}</p>
           </div>
@@ -152,41 +154,42 @@ export function ExtractionPanel() {
   const documents = useDocStore((state) => state.documents);
   const extractions = useDocStore((state) => state.extractions);
   const extractErrors = useDocStore((state) => state.extractErrors);
+  const extractionDocumentKey = useDocStore((state) => state.extractionDocumentKey);
+  const markExtractionAttempt = useDocStore((state) => state.markExtractionAttempt);
   const { mutate, isPending } = useExtractShipments();
 
-  // Auto-run extraction — once per distinct set of uploaded documents, not
-  // once per render, so a failed request (rejected promise, nothing recorded
-  // in the store) doesn't retry forever, and adding more documents later
-  // re-triggers a fresh attempt covering the new set.
-  const attemptedIdsRef = useRef("");
+  // The attempt key lives in the session store rather than this panel so
+  // switching tabs (which remounts the panel) never regenerates unchanged
+  // extraction data. Uploading/removing documents and reset clear the key.
   const documentIds = documents
     .map((doc) => doc.document_id)
     .sort()
     .join(",");
 
   useEffect(() => {
-    if (documentIds && documentIds !== attemptedIdsRef.current && !isPending) {
-      attemptedIdsRef.current = documentIds;
+    if (documentIds && documentIds !== extractionDocumentKey && !isPending) {
+      markExtractionAttempt(documentIds);
       mutate();
     }
-  }, [documentIds, isPending, mutate]);
+  }, [documentIds, extractionDocumentKey, isPending, markExtractionAttempt, mutate]);
 
   if (documents.length === 0) return null;
 
-  const hasAnyResult = documents.some(
-    (doc) => extractions[doc.document_id] || extractErrors[doc.document_id],
+  const hasCompleteResultSet = documents.every(
+    (doc) =>
+      extractions[doc.document_id] !== undefined || extractErrors[doc.document_id] !== undefined,
   );
 
   return (
     <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1 py-4">
-      {!hasAnyResult && (
+      {(!hasCompleteResultSet || isPending) && (
         <div className="flex items-center gap-2 self-start text-sm text-zinc-400">
           <Loader2 className="size-4 animate-spin" aria-hidden />
           Extracting shipment fields from {documents.length} doc
           {documents.length === 1 ? "" : "s"}…
         </div>
       )}
-      {hasAnyResult && (
+      {hasCompleteResultSet && !isPending && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {documents.map((doc) => (
             <ExtractionCard
@@ -214,8 +217,8 @@ function ExtractionCard({
   const [view, setView] = useState<"fields" | "json">("fields");
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-background">
-      <DotBackgroundDemo className="h-full">
+    <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] backdrop-blur-xl">
+      <div className="relative z-10">
         <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-4 py-2.5">
           <div className="flex min-w-0 items-center gap-2">
             <FileText className="size-3.5 shrink-0 text-zinc-500" aria-hidden />
@@ -231,7 +234,7 @@ function ExtractionCard({
           </div>
         )}
         {data && (view === "fields" ? <ShipmentCard data={data} /> : <JsonBlock data={data} />)}
-      </DotBackgroundDemo>
+      </div>
     </div>
   );
 }

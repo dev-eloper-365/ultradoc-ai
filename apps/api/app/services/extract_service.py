@@ -3,7 +3,7 @@
 import asyncio
 
 from app.constants.rag import EXTRACTION_MAX_CHARS
-from app.llm.client import ainvoke_structured
+from app.llm.client import ainvoke_structured, friendly_llm_error_message
 from app.rag import documents
 from app.schemas.extract import ExtractResponse, ExtractResult, ShipmentExtraction
 from app.shared.wide_events import log
@@ -43,7 +43,12 @@ async def _extract_one(document_id: str) -> ExtractResult:
         )
         return ExtractResult(document_id=document_id, filename=meta.filename, data=data)
     except Exception as error:
-        return ExtractResult(document_id=document_id, filename=meta.filename, error=str(error))
+        log.warning("extract_failed", document_id=document_id, error_type=type(error).__name__)
+        return ExtractResult(
+            document_id=document_id,
+            filename=meta.filename,
+            error=friendly_llm_error_message(error),
+        )
 
 
 async def extract_shipment(

@@ -4,7 +4,7 @@ import { gsap } from "gsap";
 import { ChevronRight, GripVertical, Loader2, UploadCloud } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
 
-import DotBackgroundDemo from "@/components/ui/dot-background-demo";
+import CheckerboardBackground from "@/components/ui/checkerboard-background";
 import { SAMPLE_DOCUMENT_DRAG_TYPE } from "@/features/doc-chat/constants";
 import { useUploadDocuments } from "@/features/doc-chat/hooks/useUploadDocuments";
 
@@ -122,31 +122,27 @@ export function SampleDocumentsDrawer() {
           className="pointer-events-none absolute inset-0 size-full overflow-visible"
         >
           <defs>
-            <pattern id="sample-toggle-dots" width="20" height="20" patternUnits="userSpaceOnUse">
-              <circle cx="2" cy="2" r="1" fill="#404040" />
-            </pattern>
             <filter id="sample-toggle-glow" x="-60%" y="-30%" width="220%" height="160%">
               <feGaussianBlur stdDeviation="2.5" />
             </filter>
           </defs>
 
           {/* One inset compound silhouette covers the rectangle edge and forms the semicircle. */}
-          <path d="M2 0 A32 32 0 0 1 2 64 L0 64 L0 0 Z" className="fill-background" />
+          <path d="M2 0 A32 32 0 0 1 2 64 L0 64 L0 0 Z" className="fill-black" />
           {/* Occlude the parent border/glow where the semicircle replaces its middle edge. */}
-          <rect x="-6" y="1.5" width="14" height="61" fill="#111111" />
+          <rect x="-6" y="1.5" width="14" height="61" fill="#000" />
           <path
             d="M2 0 A32 32 0 0 1 2 64"
             fill="none"
-            stroke="currentColor"
+            stroke="rgba(255,255,255,0.15)"
             strokeWidth="1"
             strokeDasharray="3 3"
-            className="text-zinc-800"
           />
           <path
             d="M2 0 A32 32 0 0 1 2 64"
             fill="none"
             stroke="#00bbff"
-            strokeWidth="3"
+            strokeWidth="4"
             filter="url(#sample-toggle-glow)"
             className={`transition-opacity duration-200 ${
               isToggleGlowActive ? "opacity-60" : "opacity-0"
@@ -161,7 +157,7 @@ export function SampleDocumentsDrawer() {
               isToggleGlowActive ? "opacity-100" : "opacity-0"
             } group-hover/sample-toggle:opacity-100 group-focus-visible/sample-toggle:opacity-100`}
           />
-          <path d="M0 0 H2 M0 64 H2" fill="none" stroke="#27272a" strokeWidth="1" />
+          <path d="M0 0 H2 M0 64 H2" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
           <path
             d="M0 0 H2 M0 64 H2"
             fill="none"
@@ -171,7 +167,6 @@ export function SampleDocumentsDrawer() {
               isToggleGlowActive ? "opacity-100" : "opacity-0"
             } group-hover/sample-toggle:opacity-100 group-focus-visible/sample-toggle:opacity-100`}
           />
-          <path d="M2 0 A32 32 0 0 1 2 64 L0 64 L0 0 Z" fill="url(#sample-toggle-dots)" />
         </svg>
         <ChevronRight
           className={`relative z-30 size-5 transition-transform duration-500 ${open ? "rotate-180" : ""}`}
@@ -186,7 +181,7 @@ export function SampleDocumentsDrawer() {
 
       <div ref={drawerRef} className="h-full w-0 overflow-hidden opacity-0">
         <aside className="h-full w-72 overflow-hidden rounded-3xl border border-dashed border-white/15 bg-white/5 shadow-2xl backdrop-blur-2xl">
-          <DotBackgroundDemo className="h-full">
+          <CheckerboardBackground className="h-full">
             <div className="flex h-full flex-col p-4">
               <div className="mb-4 pl-2">
                 <p className="text-sm font-semibold text-white">Sample documents</p>
@@ -244,7 +239,7 @@ export function SampleDocumentsDrawer() {
                 ))}
               </div>
             </div>
-          </DotBackgroundDemo>
+          </CheckerboardBackground>
         </aside>
       </div>
     </div>

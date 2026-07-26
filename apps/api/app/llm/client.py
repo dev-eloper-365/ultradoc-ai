@@ -11,6 +11,7 @@ support identically; the target schema is embedded in the prompt itself
 (see ``ainvoke_structured``).
 """
 
+import re
 from functools import lru_cache
 from typing import TypeVar
 
@@ -25,11 +26,33 @@ from app.constants.llm import DEFAULT_LLM_TEMPERATURE, LLM_RETRY_MAX_ATTEMPTS
 
 _StructuredT = TypeVar("_StructuredT", bound=BaseModel)
 
+_RETRY_AFTER_RE = re.compile(r"try again in(?: (\d+)m)? ?([\d.]+)s", re.IGNORECASE)
+
 
 def with_llm_retry(runnable: Runnable, *, max_attempts: int = LLM_RETRY_MAX_ATTEMPTS) -> Runnable:
     """Wrap a runnable so transient provider/network errors (timeouts, 429s,
     5xx) are retried with exponential backoff before the caller sees them."""
     return runnable.with_retry(stop_after_attempt=max_attempts, wait_exponential_jitter=True)
+
+
+def friendly_llm_error_message(error: Exception) -> str:
+    """Distill a raw provider exception into a short, user-facing message.
+    Provider error payloads (e.g. Groq's 429 responses) are packed with
+    internal details — org IDs, token counts, billing links — that mean
+    nothing to an end user and just clutter the UI with a wall of JSON."""
+    text = str(error)
+    if "rate_limit_exceeded" in text or "429" in text:
+        match = _RETRY_AFTER_RE.search(text)
+        if match:
+            minutes_part, seconds_part = match.groups()
+            total_seconds = int(minutes_part or 0) * 60 + float(seconds_part)
+            minutes = int(total_seconds // 60)
+            if minutes >= 1:
+                plural = "s" if minutes != 1 else ""
+                return f"Rate limit reached — try again in about {minutes} minute{plural}."
+            return "Rate limit reached — try again in a few seconds."
+        return "Rate limit reached. Please try again shortly."
+    return "The document assistant is temporarily unavailable. Please try again."
 
 
 @lru_cache

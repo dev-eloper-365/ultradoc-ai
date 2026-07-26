@@ -38,6 +38,44 @@ export interface ConfidenceScoreProps {
   className?: string;
 }
 
+/** One retrieved passage backing the answer — its own bordered card (instead
+ * of a flat divider row) so multiple sources read as distinct, scannable
+ * units, with the full passage text a click away instead of stuck at a
+ * 3-line clamp. */
+function SourceCard({ source }: { source: SourceItem }) {
+  const [expanded, setExpanded] = useState(false);
+  const isLong = source.text.length > 220;
+
+  return (
+    <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3 backdrop-blur-xl">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
+        <span className="flex min-w-0 items-center gap-1.5 text-xs text-zinc-300">
+          <FileText className="size-3.5 shrink-0 text-primary" aria-hidden />
+          <span className="truncate font-medium">{source.filename}</span>
+          <span className="shrink-0 text-zinc-600">· p.{source.page}</span>
+        </span>
+        <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary">
+          {Math.round(source.score * 100)}% match
+        </span>
+      </div>
+      <p
+        className={`text-xs leading-relaxed whitespace-pre-wrap text-zinc-400 ${expanded ? "" : "line-clamp-3"}`}
+      >
+        {source.text}
+      </p>
+      {isLong && (
+        <button
+          type="button"
+          onClick={() => setExpanded((value) => !value)}
+          className="mt-1.5 text-xs font-medium text-primary hover:underline"
+        >
+          {expanded ? "Show less" : "Show full passage"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function ConfidenceScore({
   status,
   label,
@@ -92,7 +130,7 @@ export function ConfidenceScore({
   return (
     <div className={`w-full ${className}`}>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        <span className="text-xs font-medium text-white">
+        <span className="text-xs font-medium text-zinc-500">
           {label}
           {typeof score === "number" && (
             <span className="ml-1 font-normal text-zinc-500">· {Math.round(score * 100)}%</span>
@@ -134,9 +172,8 @@ export function ConfidenceScore({
       </div>
 
       {whyOpen && hasWhy && (
-        <div
+        <section
           id={whyId}
-          role="region"
           aria-label="Why this confidence score"
           className="mt-2 border-t border-zinc-800 pt-2"
         >
@@ -157,25 +194,19 @@ export function ConfidenceScore({
               </li>
             )}
           </ul>
-        </div>
+        </section>
       )}
 
       {sourcesOpen && sources.length > 0 && (
-        <div id={sourcesId} role="region" aria-label="Sources" className="mt-2 space-y-1.5">
+        <section
+          id={sourcesId}
+          aria-label="Sources"
+          className="mt-2 grid grid-cols-1 gap-2 border-t border-zinc-800 pt-2 sm:grid-cols-2"
+        >
           {sources.map((source) => (
-            <div key={source.id} className="border-t border-zinc-800 pt-1.5">
-              <div className="mb-1 flex items-center justify-between gap-2 text-xs text-zinc-500">
-                <span className="flex min-w-0 items-center gap-1 text-zinc-400">
-                  <FileText className="size-3 shrink-0 text-primary" aria-hidden />
-                  <span className="truncate font-medium">{source.filename}</span>
-                  <span className="shrink-0">· p.{source.page}</span>
-                </span>
-                <span className="shrink-0">{Math.round(source.score * 100)}% match</span>
-              </div>
-              <p className="line-clamp-3 text-xs text-zinc-500">{source.text}</p>
-            </div>
+            <SourceCard key={source.id} source={source} />
           ))}
-        </div>
+        </section>
       )}
     </div>
   );

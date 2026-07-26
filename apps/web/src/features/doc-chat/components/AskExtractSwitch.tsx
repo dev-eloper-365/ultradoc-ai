@@ -76,6 +76,7 @@ const StyledWrapper = styled.div`
     top: 0;
     bottom: 0;
     width: 2px;
+    pointer-events: none;
     background: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0) 0%,
@@ -112,7 +113,7 @@ const StyledWrapper = styled.div`
     position: absolute;
     right: 0;
     height: 100%;
-    width: 150px;
+    width: 100vw;
     background: linear-gradient(
       270deg,
       var(--main-color-opacity) 0%,

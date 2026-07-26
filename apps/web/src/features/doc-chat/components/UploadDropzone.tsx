@@ -35,7 +35,7 @@ export function UploadDropzone() {
       }}
       disabled={isPending}
       className={cn(
-        "flex w-full flex-col items-center gap-4 rounded-2xl border border-white/10 bg-white/10 p-10 text-center shadow-sm backdrop-blur-xl transition-all",
+        "flex w-full flex-col items-center gap-4 rounded-2xl border border-dashed border-white/15 bg-transparent p-10 text-center transition-all",
         isDragging && "scale-[1.02] border-primary bg-primary/5",
         isPending && "cursor-wait opacity-70",
       )}

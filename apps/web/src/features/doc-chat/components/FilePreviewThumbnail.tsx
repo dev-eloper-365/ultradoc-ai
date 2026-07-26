@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { apiClient } from "@/lib/api/client";
+import { cn } from "@/lib/utils";
 
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "webp"]);
 const BROWSER_PREVIEW_EXTENSIONS = new Set(["pdf", "txt"]);
@@ -31,9 +32,11 @@ function DocumentPageFallback() {
 export function FilePreviewThumbnail({
   documentId,
   filename,
+  className,
 }: {
   documentId: string;
   filename: string;
+  className?: string;
 }) {
   const extension = extensionOf(filename);
   const canRenderOriginal =
@@ -80,7 +83,12 @@ export function FilePreviewThumbnail({
     extension === "pdf" ? `${blobUrl}#page=1&toolbar=0&navpanes=0&scrollbar=0&view=FitH` : blobUrl;
 
   return (
-    <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-white shadow-md">
+    <div
+      className={cn(
+        "relative h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-white shadow-md",
+        className,
+      )}
+    >
       {!canRenderOriginal || failed ? (
         <DocumentPageFallback />
       ) : !blobUrl && textPreview === null ? (

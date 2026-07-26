@@ -5,6 +5,7 @@ import { geistMono, inter } from "@/app/fonts";
 import { Providers } from "@/layouts/Providers";
 
 import "@/app/styles/globals.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 export const metadata: Metadata = {
   title: "UltraDoc AI",

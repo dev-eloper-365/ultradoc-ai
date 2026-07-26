@@ -139,11 +139,12 @@
   .imessage-bubble {
     word-wrap: break-word;
     overflow-wrap: anywhere;
-    line-height: 24px;
+    font-size: 0.8125rem;
+    line-height: 19px;
     position: relative;
-    padding: 16px 20px;
+    padding: 10px 14px;
     max-width: min(70vw, 100%);
-    border-radius: 20px;
+    border-radius: 16px;
   }
 
   .imessage-bubble::before {
@@ -157,43 +158,22 @@
   .imessage-grouped-first,
   .imessage-grouped-last,
   .imessage-grouped-middle {
-    border-radius: 20px;
+    border-radius: 16px;
   }
 
-  /* Frosted glass: translucent blurred fill + a soft gradient "edge" ring
-   * drawn by ::after (mask-composite subtracts its padding-box, leaving only
-   * the border-box ring visible) — lighter at the top, darker at the
-   * bottom, like light catching the rim of real glass. Cheaper and more
-   * reliable than an SVG-distortion layer, and doesn't touch the tail
-   * (::before, the speech-bubble pointer) or the text. */
+  /* Match the extracted cards' 3%-white-over-black tone with its opaque
+   * equivalent, so the page grid cannot show through the response. */
   .imessage-from-them {
-    background: rgba(39, 39, 42, 0.35);
+    background: #080808;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     align-self: flex-start;
   }
 
-  .imessage-from-them::before {
-    left: -7px;
-    background-color: rgba(39, 39, 42, 0.35);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    clip-path: path("M 20 0 L 20 2 A 16 16 0 0 1 4 18 L 0 18 L 0 17.54 A 10 10 0 0 0 7 8 L 7 0 Z");
-  }
-
+  .imessage-from-them::before,
   .imessage-from-them::after {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-    border-radius: inherit;
-    border: 1px solid transparent;
-    background: linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05)) border-box;
-    mask: linear-gradient(black, black) border-box, linear-gradient(black, black) padding-box;
-    -webkit-mask: linear-gradient(black, black) border-box, linear-gradient(black, black)
-      padding-box;
-    mask-composite: subtract;
-    -webkit-mask-composite: xor;
+    display: none;
   }
 
   .imessage-from-me {

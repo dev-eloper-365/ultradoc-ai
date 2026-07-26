@@ -93,7 +93,7 @@ export function DocumentPreview({
       <iframe
         src={blobUrl ? `${blobUrl}#toolbar=0` : undefined}
         title={filename}
-        className="h-72 w-full rounded-b-xl border-0 bg-white"
+        className="h-96 w-full rounded-b-xl border-0 bg-white"
       />
     );
   }
