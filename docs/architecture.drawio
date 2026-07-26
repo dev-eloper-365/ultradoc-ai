@@ -29,7 +29,7 @@
           <mxGeometry x="400" y="300" width="280" height="60" as="geometry" />
         </mxCell>
 
-        <mxCell id="chroma" value="Chroma vector store&#10;(ephemeral — no disk&#10;on free plan)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+        <mxCell id="chroma" value="Chroma vector store&#10;(ephemeral, no disk&#10;on free plan)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
           <mxGeometry x="400" y="380" width="130" height="70" as="geometry" />
         </mxCell>
 
@@ -73,7 +73,7 @@
         <mxCell id="1" parent="0" />
 
         <!-- Before group -->
-        <mxCell id="before_group" value="First choice — deployed, then OOM'd on Render free tier" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+        <mxCell id="before_group" value="First choice: deployed, then OOM'd on Render free tier" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="60" width="360" height="300" as="geometry" />
         </mxCell>
 
@@ -90,7 +90,7 @@
         </mxCell>
 
         <!-- After group -->
-        <mxCell id="after_group" value="Switched to — fits the free tier" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+        <mxCell id="after_group" value="Switched to: fits the free tier" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="680" y="60" width="360" height="300" as="geometry" />
         </mxCell>
 
@@ -102,12 +102,12 @@
           <mxGeometry x="700" y="190" width="320" height="60" as="geometry" />
         </mxCell>
 
-        <mxCell id="new_total" value="= 170 MB of model weights — same two-stage design kept" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2f0d9;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+        <mxCell id="new_total" value="= 170 MB of model weights, same two-stage design kept" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2f0d9;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="700" y="270" width="320" height="60" as="geometry" />
         </mxCell>
 
         <!-- Transition arrow -->
-        <mxCell id="e_switch" value="512MB RAM limit hit —&#10;/upload 502'd every time&#10;(health check passed,&#10;models never loaded)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeWidth=2;dashed=1;" edge="1" parent="1" source="old_total" target="after_group">
+        <mxCell id="e_switch" value="512MB RAM limit hit:&#10;/upload 502'd every time&#10;(health check passed,&#10;models never loaded)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeWidth=2;dashed=1;" edge="1" parent="1" source="old_total" target="after_group">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
