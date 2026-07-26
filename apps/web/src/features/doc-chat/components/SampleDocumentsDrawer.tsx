@@ -190,20 +190,6 @@ export function SampleDocumentsDrawer() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={uploadAllSamples}
-                disabled={isUploadingAll}
-                className="mb-3 flex items-center justify-center gap-2 rounded-2xl border border-primary/40 bg-primary/10 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isUploadingAll ? (
-                  <Loader2 className="size-3.5 animate-spin" aria-hidden />
-                ) : (
-                  <UploadCloud className="size-3.5" aria-hidden />
-                )}
-                {isUploadingAll ? "Uploading…" : "Upload all samples"}
-              </button>
-
               <div className="flex flex-1 flex-col gap-3">
                 {SAMPLE_DOCUMENTS.map((sample) => (
                   <div
@@ -217,7 +203,7 @@ export function SampleDocumentsDrawer() {
                       );
                       event.dataTransfer.setData("text/plain", sample.filename);
                     }}
-                    className="group flex cursor-grab items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-2.5 backdrop-blur-xl transition-colors hover:border-primary/40 active:cursor-grabbing"
+                    className="group flex cursor-grab items-center gap-3 rounded-2xl border border-zinc-800 bg-black p-2.5 backdrop-blur-xl transition-colors hover:border-white/10 hover:bg-white/[0.03] active:cursor-grabbing"
                   >
                     <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg border border-white/15 bg-white">
                       <iframe
@@ -238,6 +224,20 @@ export function SampleDocumentsDrawer() {
                   </div>
                 ))}
               </div>
+
+              <button
+                type="button"
+                onClick={uploadAllSamples}
+                disabled={isUploadingAll}
+                className="mt-3 flex items-center justify-center gap-2 rounded-2xl border border-zinc-800 bg-black px-3 py-2 text-xs font-medium text-primary backdrop-blur-xl transition-colors hover:border-primary/40 hover:bg-white/[0.03] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isUploadingAll ? (
+                  <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                ) : (
+                  <UploadCloud className="size-3.5" aria-hidden />
+                )}
+                {isUploadingAll ? "Uploading…" : "Upload all samples"}
+              </button>
             </div>
           </CheckerboardBackground>
         </aside>

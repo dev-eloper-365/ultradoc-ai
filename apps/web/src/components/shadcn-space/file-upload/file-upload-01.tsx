@@ -268,7 +268,10 @@ const RocketUploadPanel: React.FC<{ children: React.ReactNode; dragActive: boole
     }, rocketRef);
 
     return () => {
-      gsap.killTweensOf([rocketRef.current, thrustRef.current, outlineGlowRef.current]);
+      const targets = [rocketRef.current, thrustRef.current, outlineGlowRef.current].filter(
+        (target): target is HTMLDivElement => target !== null,
+      );
+      if (targets.length > 0) gsap.killTweensOf(targets);
       media.revert();
       context.revert();
     };

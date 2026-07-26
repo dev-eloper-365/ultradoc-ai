@@ -32,7 +32,7 @@ export default function Home() {
   const sidebarLogoSlotRef = useRef<HTMLDivElement>(null);
   const observedUserMessageCountRef = useRef<number | null>(null);
 
-  useHydrateDocuments();
+  const { isReconcilingStoredDocuments } = useHydrateDocuments();
   const documents = useDocStore((state) => state.documents);
   const messages = useDocStore((state) => state.messages);
   const clearConversation = useDocStore((state) => state.clearConversation);
@@ -119,13 +119,17 @@ export default function Home() {
     if (observedUserMessageCountRef.current === null) {
       observedUserMessageCountRef.current = userMessageCount;
       if (userMessageCount > 0) {
-        gsap.set(sidebarLogoSlotRef.current, { height: 43 });
-        gsap.set(sidebarLogoRef.current, {
-          autoAlpha: 1,
-          x: 0,
-          y: 0,
-          clipPath: "none",
-        });
+        const slot = sidebarLogoSlotRef.current;
+        const logo = sidebarLogoRef.current;
+        if (slot) gsap.set(slot, { height: 43 });
+        if (logo) {
+          gsap.set(logo, {
+            autoAlpha: 1,
+            x: 0,
+            y: 0,
+            clipPath: "none",
+          });
+        }
       }
       return;
     }
@@ -170,23 +174,26 @@ export default function Home() {
   }, [userMessageCount]);
 
   const hasDocuments = documents.length > 0;
+  const showPageLoader = showLoader || isReconcilingStoredDocuments;
   useEffect(() => {
     if (hasDocuments) return;
     sidebarLogoHasDockedRef.current = false;
     setSidebarLogoDocked(false);
-    gsap.set(sidebarLogoSlotRef.current, { height: 0 });
-    gsap.set(sidebarLogoRef.current, { autoAlpha: 0, x: 0, y: 0, clipPath: "none" });
+    const slot = sidebarLogoSlotRef.current;
+    const logo = sidebarLogoRef.current;
+    if (slot) gsap.set(slot, { height: 0 });
+    if (logo) gsap.set(logo, { autoAlpha: 0, x: 0, y: 0, clipPath: "none" });
   }, [hasDocuments]);
 
   return (
     <main ref={pageRef} className="relative isolate flex h-dvh flex-col overflow-hidden">
-      {(!hasDocuments || showLoader) && <BackgroundBeams className="-z-10 bg-black" />}
-      {hasDocuments && !showLoader && (
+      {(!hasDocuments || showPageLoader) && <BackgroundBeams className="-z-10 bg-black" />}
+      {hasDocuments && !showPageLoader && (
         <GridSmallBackgroundDemo className="pointer-events-none absolute inset-0 z-0 h-full" />
       )}
       <div className="relative z-10 flex h-full w-full flex-col gap-2 px-2 py-3 sm:px-4 lg:px-6">
         {hasDocuments &&
-          !showLoader &&
+          !showPageLoader &&
           activeSection === "ask" &&
           messages.length === 0 &&
           !isAsking && (
@@ -206,7 +213,7 @@ export default function Home() {
             </header>
           )}
 
-        {!hasDocuments || showLoader ? (
+        {!hasDocuments || showPageLoader ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-8">
             <header ref={headerRef} className="text-center">
               <h1 className="text-3xl font-extrabold tracking-wide text-white sm:text-4xl">
@@ -234,7 +241,7 @@ export default function Home() {
                   className="z-50"
                 />
                 <CheckerboardBackground className="rounded-[inherit]">
-                  {showLoader ? (
+                  {showPageLoader ? (
                     <div className="flex min-h-[248px] items-center justify-center p-6">
                       <Loader />
                     </div>
@@ -247,7 +254,7 @@ export default function Home() {
                   )}
                 </CheckerboardBackground>
               </div>
-              {!showLoader && <SampleDocumentsDrawer />}
+              {!showPageLoader && <SampleDocumentsDrawer />}
             </div>
           </div>
         ) : (

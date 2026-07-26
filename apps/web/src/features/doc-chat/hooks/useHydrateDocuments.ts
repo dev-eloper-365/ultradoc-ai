@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { listDocuments } from "@/features/doc-chat/api/docApi";
 import { useDocStore } from "@/features/doc-chat/stores/docStore";
@@ -11,11 +11,18 @@ import { useDocStore } from "@/features/doc-chat/stores/docStore";
 export function useHydrateDocuments() {
   const setDocuments = useDocStore((state) => state.setDocuments);
   const documentsInStore = useDocStore((state) => state.documents);
+  const [hasReconciled, setHasReconciled] = useState(false);
   const query = useQuery({ queryKey: ["documents"], queryFn: listDocuments });
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only re-run when query.data changes; including documentsInStore would clobber docs added after hydration
+  // The backend is authoritative. Render's ephemeral filesystem can be reset
+  // while this tab's sessionStorage still contains the old document IDs.
+  // Replacing the saved list prevents preview requests for files that no
+  // longer exist after an instance restart.
   useEffect(() => {
-    if (!query.data || documentsInStore.length > 0) return;
+    if (!query.data) {
+      if (query.isError) setHasReconciled(true);
+      return;
+    }
     setDocuments(
       query.data.map((doc) => ({
         document_id: doc.document_id,
@@ -25,7 +32,11 @@ export function useHydrateDocuments() {
         status: "ready",
       })),
     );
-  }, [query.data, setDocuments]);
+    setHasReconciled(true);
+  }, [query.data, query.isError, setDocuments]);
 
-  return query;
+  return {
+    ...query,
+    isReconcilingStoredDocuments: documentsInStore.length > 0 && !hasReconciled,
+  };
 }
