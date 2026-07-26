@@ -64,7 +64,7 @@ export function Composer({
   };
 
   return (
-    <div className="mb-2 flex items-end gap-2 rounded-3xl border border-white/10 bg-white/10 px-4 py-2.5 backdrop-blur-xl">
+    <div className="mb-2 flex w-full items-end gap-2 rounded-3xl border border-white/10 bg-white/10 px-4 py-2.5 backdrop-blur-xl">
       <textarea
         ref={textareaRef}
         value={value}

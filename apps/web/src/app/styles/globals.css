@@ -216,6 +216,123 @@
   }
 }
 
+/* Fireflies — ported from a Sass @for-loop demo (fireflies.tsx generates the
+   per-instance randomness as CSS custom properties; every firefly shares
+   this one @keyframes instead of each getting its own generated rule). */
+@layer components {
+  .firefly {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0.4vw;
+    height: 0.4vw;
+    margin: -0.2vw 0 0 9.8vw;
+    animation: firefly-move 200s ease alternate infinite;
+    pointer-events: none;
+  }
+
+  .firefly::before,
+  .firefly::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transform-origin: -10vw;
+  }
+
+  .firefly::before {
+    background: var(--color-primary);
+    opacity: 0.35;
+    animation: firefly-drift var(--fdrift-duration, 12s) ease alternate infinite;
+  }
+
+  .firefly::after {
+    background: white;
+    opacity: 0;
+    box-shadow: 0 0 0vw 0vw var(--color-primary);
+    animation: firefly-drift var(--fdrift-duration, 12s) ease alternate infinite, firefly-flash
+      var(--fflash-duration, 6000ms) ease infinite;
+    animation-delay: 0ms, var(--fflash-delay, 1000ms);
+  }
+
+  @keyframes firefly-move {
+    0% {
+      transform: translateX(var(--fx0)) translateY(var(--fy0)) scale(var(--fs0));
+    }
+    6.25% {
+      transform: translateX(var(--fx1)) translateY(var(--fy1)) scale(var(--fs1));
+    }
+    12.5% {
+      transform: translateX(var(--fx2)) translateY(var(--fy2)) scale(var(--fs2));
+    }
+    18.75% {
+      transform: translateX(var(--fx3)) translateY(var(--fy3)) scale(var(--fs3));
+    }
+    25% {
+      transform: translateX(var(--fx4)) translateY(var(--fy4)) scale(var(--fs4));
+    }
+    31.25% {
+      transform: translateX(var(--fx5)) translateY(var(--fy5)) scale(var(--fs5));
+    }
+    37.5% {
+      transform: translateX(var(--fx6)) translateY(var(--fy6)) scale(var(--fs6));
+    }
+    43.75% {
+      transform: translateX(var(--fx7)) translateY(var(--fy7)) scale(var(--fs7));
+    }
+    50% {
+      transform: translateX(var(--fx8)) translateY(var(--fy8)) scale(var(--fs8));
+    }
+    56.25% {
+      transform: translateX(var(--fx9)) translateY(var(--fy9)) scale(var(--fs9));
+    }
+    62.5% {
+      transform: translateX(var(--fx10)) translateY(var(--fy10)) scale(var(--fs10));
+    }
+    68.75% {
+      transform: translateX(var(--fx11)) translateY(var(--fy11)) scale(var(--fs11));
+    }
+    75% {
+      transform: translateX(var(--fx12)) translateY(var(--fy12)) scale(var(--fs12));
+    }
+    81.25% {
+      transform: translateX(var(--fx13)) translateY(var(--fy13)) scale(var(--fs13));
+    }
+    87.5% {
+      transform: translateX(var(--fx14)) translateY(var(--fy14)) scale(var(--fs14));
+    }
+    93.75% {
+      transform: translateX(var(--fx15)) translateY(var(--fy15)) scale(var(--fs15));
+    }
+    100% {
+      transform: translateX(var(--fx16)) translateY(var(--fy16)) scale(var(--fs16));
+    }
+  }
+
+  @keyframes firefly-drift {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes firefly-flash {
+    0%,
+    30%,
+    100% {
+      opacity: 0;
+      box-shadow: 0 0 0vw 0vw var(--color-primary);
+    }
+    5% {
+      opacity: 1;
+      box-shadow: 0 0 2vw 0.4vw var(--color-primary);
+    }
+  }
+}
+
 /* Hand-rolled markdown formatting for assistant answers (Streamdown output).
    Scoped narrowly (no wildcard descendant selectors) so Streamdown's own
    syntax-highlighted code, links, and table colors aren't clobbered. */

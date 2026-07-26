@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import DotBackgroundDemo from "@/components/ui/dot-background-demo";
 import { DocumentPreview } from "@/features/doc-chat/components/DocumentPreview";
 import { FilePreviewThumbnail } from "@/features/doc-chat/components/FilePreviewThumbnail";
 import type { UploadResponse } from "@/types/api";
@@ -46,32 +47,35 @@ export function DocChip({
 
   return (
     <div ref={wrapperRef} className="relative shrink-0">
-      <div className="flex items-center gap-5 rounded-2xl border border-white/10 bg-white/10 py-2.5 pr-4 pl-2.5 backdrop-blur-xl transition-colors">
-        <button
-          type="button"
-          onClick={openPreview}
-          title="Click to preview"
-          className="flex min-w-0 items-center gap-3 text-left"
-        >
-          <FilePreviewThumbnail documentId={document.document_id} filename={document.filename} />
-          <div className="min-w-0">
-            <p className="max-w-[10rem] truncate text-xs font-medium text-white">
-              {document.filename}
-            </p>
-            <p className="text-[10px] text-zinc-500">
-              {document.pages} page{document.pages === 1 ? "" : "s"} · {document.chunk_count} chunks
-            </p>
-          </div>
-        </button>
-        <button
-          type="button"
-          onClick={onRemove}
-          title="Remove from this session"
-          className="rounded-full p-0.5 text-zinc-500 transition-colors hover:bg-zinc-700 hover:text-white"
-        >
-          <X className="size-3.5" />
-        </button>
-      </div>
+      <DotBackgroundDemo className="overflow-hidden rounded-2xl border border-white/10">
+        <div className="flex items-center gap-5 py-2.5 pr-4 pl-2.5">
+          <button
+            type="button"
+            onClick={openPreview}
+            title="Click to preview"
+            className="flex min-w-0 items-center gap-3 text-left"
+          >
+            <FilePreviewThumbnail documentId={document.document_id} filename={document.filename} />
+            <div className="min-w-0">
+              <p className="max-w-[10rem] truncate text-xs font-medium text-white">
+                {document.filename}
+              </p>
+              <p className="text-[10px] text-zinc-500">
+                {document.pages} page{document.pages === 1 ? "" : "s"} · {document.chunk_count}{" "}
+                chunks
+              </p>
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={onRemove}
+            title="Remove from this session"
+            className="rounded-full p-0.5 text-zinc-500 transition-colors hover:bg-zinc-700 hover:text-white"
+          >
+            <X className="size-3.5" />
+          </button>
+        </div>
+      </DotBackgroundDemo>
 
       {previewOpen &&
         previewRect &&

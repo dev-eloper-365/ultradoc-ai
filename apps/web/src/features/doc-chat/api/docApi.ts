@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/api/client";
+import { API_BASE_URL, apiClient } from "@/lib/api/client";
 import type {
   AskResponse,
   DocumentSummary,
@@ -6,6 +6,48 @@ import type {
   HistoryTurn,
   UploadBatchItem,
 } from "@/types/api";
+
+const HEALTH_PROBE_TIMEOUT_MS = 2500;
+const HEALTH_POLL_INTERVAL_MS = 3000;
+const BACKEND_WAKE_TIMEOUT_MS = 120_000;
+
+async function backendIsHealthy(): Promise<boolean> {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), HEALTH_PROBE_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/health`, {
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    if (!response.ok) return false;
+    const data = (await response.json()) as { status?: string };
+    return data.status === "ok";
+  } catch {
+    return false;
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
+/**
+ * Render's free tier can take 50+ seconds to wake. Probe quickly, notify the
+ * caller only when a cold start is detected, then keep polling long enough for
+ * the queued request to continue automatically once the service is available.
+ */
+export async function waitForBackend(onWaking: () => void): Promise<void> {
+  if (await backendIsHealthy()) return;
+
+  onWaking();
+  const deadline = Date.now() + BACKEND_WAKE_TIMEOUT_MS;
+
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => window.setTimeout(resolve, HEALTH_POLL_INTERVAL_MS));
+    if (await backendIsHealthy()) return;
+  }
+
+  throw new Error("The document service is still starting. Please try again in a moment.");
+}
 
 export async function listDocuments(): Promise<DocumentSummary[]> {
   const { data } = await apiClient.get<{ documents: DocumentSummary[] }>("/documents");

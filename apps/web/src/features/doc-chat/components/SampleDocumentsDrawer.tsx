@@ -1,11 +1,12 @@
 "use client";
 
 import { gsap } from "gsap";
-import { ChevronRight, GripVertical } from "lucide-react";
+import { ChevronRight, GripVertical, Loader2, UploadCloud } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
 
 import DotBackgroundDemo from "@/components/ui/dot-background-demo";
 import { SAMPLE_DOCUMENT_DRAG_TYPE } from "@/features/doc-chat/constants";
+import { useUploadDocuments } from "@/features/doc-chat/hooks/useUploadDocuments";
 
 const SAMPLE_DOCUMENTS = [
   {
@@ -30,6 +31,18 @@ export function SampleDocumentsDrawer() {
   const [isToggleGlowActive, setIsToggleGlowActive] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const { mutate: upload, isPending: isUploadingAll } = useUploadDocuments();
+
+  const uploadAllSamples = async () => {
+    const files = await Promise.all(
+      SAMPLE_DOCUMENTS.map(async (sample) => {
+        const response = await fetch(sample.url);
+        const blob = await response.blob();
+        return new File([blob], sample.filename, { type: blob.type || "application/pdf" });
+      }),
+    );
+    upload(files);
+  };
 
   useLayoutEffect(() => {
     const drawer = drawerRef.current;
@@ -181,6 +194,20 @@ export function SampleDocumentsDrawer() {
                   Drag a sample onto the upload area.
                 </p>
               </div>
+
+              <button
+                type="button"
+                onClick={uploadAllSamples}
+                disabled={isUploadingAll}
+                className="mb-3 flex items-center justify-center gap-2 rounded-2xl border border-primary/40 bg-primary/10 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isUploadingAll ? (
+                  <Loader2 className="size-3.5 animate-spin" aria-hidden />
+                ) : (
+                  <UploadCloud className="size-3.5" aria-hidden />
+                )}
+                {isUploadingAll ? "Uploading…" : "Upload all samples"}
+              </button>
 
               <div className="flex flex-1 flex-col gap-3">
                 {SAMPLE_DOCUMENTS.map((sample) => (

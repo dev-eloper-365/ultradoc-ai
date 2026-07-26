@@ -10,7 +10,7 @@ services:
       - key: ENV
         value: production
       - key: FRONTEND_URL
-        sync: false # set to the deployed Vercel URL, e.g. https://ultradoc-ai.vercel.app
+        value: https://ultradoc-ai.vercel.app
       - key: LLM_BASE_URL
         value: https://api.groq.com/openai/v1
       - key: LLM_API_KEY

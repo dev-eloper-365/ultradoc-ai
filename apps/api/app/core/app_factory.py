@@ -25,9 +25,17 @@ def create_app() -> FastAPI:
         redoc_url=None if is_prod else "/redoc",
     )
 
+    allowed_origins = {
+        "http://localhost:3000",
+        "https://ultradoc-ai.vercel.app",
+    }
+    if settings.FRONTEND_URL:
+        allowed_origins.add(settings.FRONTEND_URL)
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[settings.FRONTEND_URL, "http://localhost:3000"],
+        allow_origins=sorted(allowed_origins),
+        allow_origin_regex=r"https://ultradoc-ai(?:-[a-z0-9-]+)?\.vercel\.app",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

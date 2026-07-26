@@ -21,12 +21,14 @@ interface DocState {
   extractions: Record<string, ShipmentExtraction>;
   extractErrors: Record<string, string>;
   isAsking: boolean;
+  isBackendWaking: boolean;
   isExtracting: boolean;
   addDocuments: (documents: UploadResponse[]) => void;
   setDocuments: (documents: UploadResponse[]) => void;
   removeDocument: (documentId: string) => void;
   addMessage: (message: ChatMessage) => void;
   setAsking: (isAsking: boolean) => void;
+  setBackendWaking: (isBackendWaking: boolean) => void;
   setExtractions: (
     results: { document_id: string; data: ShipmentExtraction | null; error: string | null }[],
   ) => void;
@@ -42,6 +44,7 @@ export const useDocStore = create<DocState>()(
       extractions: {},
       extractErrors: {},
       isAsking: false,
+      isBackendWaking: false,
       isExtracting: false,
       addDocuments: (documents) =>
         set((state) => {
@@ -56,6 +59,7 @@ export const useDocStore = create<DocState>()(
         })),
       addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
       setAsking: (isAsking) => set({ isAsking }),
+      setBackendWaking: (isBackendWaking) => set({ isBackendWaking }),
       setExtractions: (results) =>
         set((state) => {
           const extractions = { ...state.extractions };
@@ -77,6 +81,7 @@ export const useDocStore = create<DocState>()(
           messages: [],
           extractions: {},
           extractErrors: {},
+          isBackendWaking: false,
         }),
     }),
     {

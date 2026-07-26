@@ -7,7 +7,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FileUploadStruc } from "@/components/shadcn-space/file-upload/file-upload-01";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import DotBackgroundDemo from "@/components/ui/dot-background-demo";
+import { Fireflies } from "@/components/ui/fireflies";
 import { GlowingEffect } from "@/components/ui/glowing-effect";
+import GridSmallBackgroundDemo from "@/components/ui/grid-small-background-demo";
 import Loader from "@/components/ui/loader";
 import type { PanelSection } from "@/features/doc-chat/components/AskExtractSwitch";
 import { AskExtractSwitch } from "@/features/doc-chat/components/AskExtractSwitch";
@@ -28,6 +30,7 @@ export default function Home() {
 
   useHydrateDocuments();
   const documents = useDocStore((state) => state.documents);
+  const messages = useDocStore((state) => state.messages);
   const reset = useDocStore((state) => state.reset);
   const isAsking = useDocStore((state) => state.isAsking);
   const { mutate: ask } = useAskQuestion();
@@ -94,26 +97,43 @@ export default function Home() {
     <main ref={pageRef} className="relative isolate flex h-dvh flex-col overflow-hidden">
       {(!hasDocuments || showLoader) && <BackgroundBeams className="-z-10" />}
       {hasDocuments && !showLoader && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 bg-[url('/backgrounds/glass-slats.webp')] bg-cover bg-center"
-        />
+        <GridSmallBackgroundDemo className="pointer-events-none absolute inset-0 z-0 h-full" />
       )}
       <div className="relative z-10 flex h-full w-full flex-col gap-2 px-2 py-3 sm:px-4 lg:px-6">
-        <header ref={headerRef} className="pt-2">
-          <h1 className="text-3xl font-extrabold tracking-wide text-white sm:text-4xl">
-            <span className="italic">
-              <span className="text-primary">ULTRA</span>DOC
-            </span>{" "}
-            AI
-          </h1>
-          <p className="mt-2 text-base text-zinc-500 sm:text-lg">
-            Upload logistics documents, ask questions, and extract shipment data.
-          </p>
-        </header>
+        {hasDocuments &&
+          !showLoader &&
+          activeSection === "ask" &&
+          messages.length === 0 &&
+          !isAsking && (
+            <header
+              ref={headerRef}
+              className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-4 text-center opacity-90"
+            >
+              <h1 className="text-3xl font-extrabold tracking-wide text-white sm:text-4xl">
+                <span className="italic">
+                  <span className="text-primary">ULTRA</span>DOC
+                </span>{" "}
+                AI
+              </h1>
+              <p className="mt-2 text-base text-zinc-500 sm:text-lg">
+                Upload logistics documents, ask questions, and extract shipment data.
+              </p>
+            </header>
+          )}
 
         {!hasDocuments || showLoader ? (
-          <div className="flex flex-1 items-center justify-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-8">
+            <header ref={headerRef} className="text-center">
+              <h1 className="text-3xl font-extrabold tracking-wide text-white sm:text-4xl">
+                <span className="italic">
+                  <span className="text-primary">ULTRA</span>DOC
+                </span>{" "}
+                AI
+              </h1>
+              <p className="mt-2 text-base text-zinc-500 sm:text-lg">
+                Upload logistics documents, ask questions, and extract shipment data.
+              </p>
+            </header>
             <div className="flex w-full max-w-6xl items-center justify-center">
               <div
                 ref={uploadPanelRef}
@@ -147,31 +167,39 @@ export default function Home() {
           </div>
         ) : (
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden pt-4">
-            <DocumentTray onStartOver={reset} />
+            <div className="flex min-h-0 flex-1 gap-4 overflow-hidden">
+              <aside className="relative flex min-h-0 w-72 shrink-0 flex-col gap-3 overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-3 shadow-[0_0_40px_-16px_var(--color-primary)] backdrop-blur-2xl">
+                <GlowingEffect
+                  spread={80}
+                  glow
+                  disabled={false}
+                  proximity={48}
+                  inactiveZone={0.01}
+                  borderWidth={2}
+                />
+                <DocumentTray onStartOver={reset} />
+                <div className="shrink-0 border-t border-white/10 pt-2">
+                  <AskExtractSwitch value={activeSection} onChange={setActiveSection} />
+                </div>
+              </aside>
 
-            <AskExtractSwitch value={activeSection} onChange={setActiveSection} />
-
-            <div className="flex min-h-0 flex-1 flex-col">
-              <AnimatePresence initial={false} mode="wait">
-                <motion.div
-                  key={activeSection}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex h-full min-h-0 flex-col"
-                >
-                  {activeSection === "ask" ? (
-                    <div className="flex h-full min-h-0 flex-col gap-3">
-                      <ChatMessages />
-                      <Composer onSubmit={ask} disabled={isAsking} />
-                    </div>
-                  ) : (
-                    <ExtractionPanel />
-                  )}
-                </motion.div>
-              </AnimatePresence>
+              <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+                <Fireflies className="h-[60vh] min-h-1/2" />
+                <AnimatePresence initial={false} mode="wait">
+                  <motion.div
+                    key={activeSection}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex h-full min-h-0 flex-col"
+                  >
+                    {activeSection === "ask" ? <ChatMessages /> : <ExtractionPanel />}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </div>
+            {activeSection === "ask" && <Composer onSubmit={ask} disabled={isAsking} />}
           </div>
         )}
       </div>

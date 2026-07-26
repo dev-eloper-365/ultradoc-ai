@@ -3,9 +3,9 @@ import { toast } from "sonner";
 
 import { getSessionId } from "@/lib/session";
 
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/";
 
-export const apiClient = axios.create({ baseURL });
+export const apiClient = axios.create({ baseURL: API_BASE_URL });
 
 apiClient.interceptors.request.use((config) => {
   const sessionId = getSessionId();

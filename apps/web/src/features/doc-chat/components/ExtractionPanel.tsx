@@ -1,8 +1,9 @@
 "use client";
 
-import { AlertTriangle, Calendar, Copy, FileText, MapPin, Truck } from "lucide-react";
-import { useState } from "react";
+import { AlertTriangle, Calendar, Copy, FileText, Loader2, MapPin, Truck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
+import DotBackgroundDemo from "@/components/ui/dot-background-demo";
 import { useExtractShipments } from "@/features/doc-chat/hooks/useExtractShipments";
 import { useDocStore } from "@/features/doc-chat/stores/docStore";
 import type { ShipmentExtraction, UploadResponse } from "@/types/api";
@@ -66,7 +67,7 @@ function ShipmentCard({ data }: { data: ShipmentExtraction }) {
 
       <div className="mb-3 grid grid-cols-2 gap-2 border-t border-zinc-800 pt-3">
         {stats.map(([label, value]) => (
-          <div key={label} className="rounded-lg bg-black/20 px-2.5 py-2 backdrop-blur-md">
+          <div key={label} className="rounded-lg bg-zinc-800/60 px-2.5 py-2 backdrop-blur-md">
             <p className="mb-0.5 text-[11px] text-zinc-500">{label}</p>
             <p className="truncate text-xs font-medium text-white">{value}</p>
           </div>
@@ -153,6 +154,23 @@ export function ExtractionPanel() {
   const extractErrors = useDocStore((state) => state.extractErrors);
   const { mutate, isPending } = useExtractShipments();
 
+  // Auto-run extraction — once per distinct set of uploaded documents, not
+  // once per render, so a failed request (rejected promise, nothing recorded
+  // in the store) doesn't retry forever, and adding more documents later
+  // re-triggers a fresh attempt covering the new set.
+  const attemptedIdsRef = useRef("");
+  const documentIds = documents
+    .map((doc) => doc.document_id)
+    .sort()
+    .join(",");
+
+  useEffect(() => {
+    if (documentIds && documentIds !== attemptedIdsRef.current && !isPending) {
+      attemptedIdsRef.current = documentIds;
+      mutate();
+    }
+  }, [documentIds, isPending, mutate]);
+
   if (documents.length === 0) return null;
 
   const hasAnyResult = documents.some(
@@ -162,16 +180,11 @@ export function ExtractionPanel() {
   return (
     <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1 py-4">
       {!hasAnyResult && (
-        <button
-          type="button"
-          onClick={() => mutate()}
-          disabled={isPending}
-          className="self-start rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition-transform active:scale-95 disabled:opacity-50"
-        >
-          {isPending
-            ? "Extracting..."
-            : `Extract shipment fields (${documents.length} doc${documents.length === 1 ? "" : "s"})`}
-        </button>
+        <div className="flex items-center gap-2 self-start text-sm text-zinc-400">
+          <Loader2 className="size-4 animate-spin" aria-hidden />
+          Extracting shipment fields from {documents.length} doc
+          {documents.length === 1 ? "" : "s"}…
+        </div>
       )}
       {hasAnyResult && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -201,22 +214,24 @@ function ExtractionCard({
   const [view, setView] = useState<"fields" | "json">("fields");
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/10 backdrop-blur-xl">
-      <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-4 py-2.5">
-        <div className="flex min-w-0 items-center gap-2">
-          <FileText className="size-3.5 shrink-0 text-zinc-500" aria-hidden />
-          <p className="truncate text-xs font-medium text-zinc-400">{document.filename}</p>
+    <div className="overflow-hidden rounded-2xl border border-white/10 bg-background">
+      <DotBackgroundDemo className="h-full">
+        <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-4 py-2.5">
+          <div className="flex min-w-0 items-center gap-2">
+            <FileText className="size-3.5 shrink-0 text-zinc-500" aria-hidden />
+            <p className="truncate text-xs font-medium text-zinc-400">{document.filename}</p>
+          </div>
+          {data && <FieldsJsonToggle value={view} onChange={setView} />}
         </div>
-        {data && <FieldsJsonToggle value={view} onChange={setView} />}
-      </div>
 
-      {error && (
-        <div className="m-4 flex items-center gap-2 rounded-xl bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
-          <AlertTriangle className="size-3.5 shrink-0" />
-          {error}
-        </div>
-      )}
-      {data && (view === "fields" ? <ShipmentCard data={data} /> : <JsonBlock data={data} />)}
+        {error && (
+          <div className="m-4 flex items-center gap-2 rounded-xl bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+            <AlertTriangle className="size-3.5 shrink-0" />
+            {error}
+          </div>
+        )}
+        {data && (view === "fields" ? <ShipmentCard data={data} /> : <JsonBlock data={data} />)}
+      </DotBackgroundDemo>
     </div>
   );
 }
