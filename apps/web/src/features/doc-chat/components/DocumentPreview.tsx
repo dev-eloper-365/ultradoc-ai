@@ -3,7 +3,7 @@
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { apiClient } from "@/lib/api/client";
+import { getDocumentFile } from "@/features/doc-chat/api/docApi";
 
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "webp"]);
 
@@ -31,16 +31,15 @@ export function DocumentPreview({
     let url: string | null = null;
     let cancelled = false;
 
-    apiClient
-      .get(`/documents/${documentId}/file`, { responseType: "blob" })
-      .then(async (response) => {
+    getDocumentFile(documentId)
+      .then(async (blob) => {
         if (cancelled) return;
         if (extension === "txt") {
-          const text = await response.data.text();
+          const text = await blob.text();
           if (!cancelled) setTextContent(text);
           return;
         }
-        url = URL.createObjectURL(response.data);
+        url = URL.createObjectURL(blob);
         setBlobUrl(url);
       })
       .catch(() => {

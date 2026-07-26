@@ -1,4 +1,4 @@
-import { API_BASE_URL, apiClient } from "@/lib/api/client";
+import { apiClient } from "@/lib/api/client";
 import type {
   AskResponse,
   DocumentSummary,
@@ -16,7 +16,11 @@ async function backendIsHealthy(): Promise<boolean> {
   const timeout = window.setTimeout(() => controller.abort(), HEALTH_PROBE_TIMEOUT_MS);
 
   try {
-    const response = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/health`, {
+    // Probe through our same-origin Next.js route. Render can emit its own
+    // headerless 502 while a free instance wakes or a deploy switches over;
+    // calling it directly from the browser makes that infrastructure response
+    // look like an application CORS failure.
+    const response = await fetch("/api/backend-health", {
       cache: "no-store",
       signal: controller.signal,
     });
@@ -35,7 +39,7 @@ async function backendIsHealthy(): Promise<boolean> {
  * caller only when a cold start is detected, then keep polling long enough for
  * the queued request to continue automatically once the service is available.
  */
-export async function waitForBackend(onWaking: () => void): Promise<void> {
+export async function waitForBackend(onWaking: () => void = () => undefined): Promise<void> {
   if (await backendIsHealthy()) return;
 
   onWaking();
@@ -50,11 +54,13 @@ export async function waitForBackend(onWaking: () => void): Promise<void> {
 }
 
 export async function listDocuments(): Promise<DocumentSummary[]> {
+  await waitForBackend();
   const { data } = await apiClient.get<{ documents: DocumentSummary[] }>("/documents");
   return data.documents;
 }
 
 export async function uploadDocuments(files: File[]): Promise<UploadBatchItem[]> {
+  await waitForBackend();
   const formData = new FormData();
   for (const file of files) formData.append("files", file);
   const { data } = await apiClient.post<{ results: UploadBatchItem[] }>("/upload/batch", formData);
@@ -75,8 +81,17 @@ export async function askQuestion(
 }
 
 export async function extractShipments(documentIds?: string[]): Promise<ExtractResult[]> {
+  await waitForBackend();
   const { data } = await apiClient.post<{ results: ExtractResult[] }>("/extract", {
     document_ids: documentIds && documentIds.length > 0 ? documentIds : null,
   });
   return data.results;
+}
+
+export async function getDocumentFile(documentId: string): Promise<Blob> {
+  await waitForBackend();
+  const { data } = await apiClient.get<Blob>(`/documents/${documentId}/file`, {
+    responseType: "blob",
+  });
+  return data;
 }

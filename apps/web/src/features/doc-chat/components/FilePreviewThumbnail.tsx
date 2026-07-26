@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { apiClient } from "@/lib/api/client";
+import { getDocumentFile } from "@/features/doc-chat/api/docApi";
 import { cn } from "@/lib/utils";
 
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "webp"]);
@@ -51,16 +51,15 @@ export function FilePreviewThumbnail({
     let url: string | null = null;
     let cancelled = false;
 
-    apiClient
-      .get(`/documents/${documentId}/file`, { responseType: "blob" })
-      .then(async (response) => {
+    getDocumentFile(documentId)
+      .then(async (blob) => {
         if (cancelled) return;
         if (extension === "txt") {
-          const text = await response.data.text();
+          const text = await blob.text();
           if (!cancelled) setTextPreview(text);
           return;
         }
-        url = URL.createObjectURL(response.data);
+        url = URL.createObjectURL(blob);
         setBlobUrl(url);
       })
       .catch(() => {
