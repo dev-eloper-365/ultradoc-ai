@@ -1,0 +1,17 @@
+apps/api
+sample/
+/pnpm-lock.yaml
+/package.json
+/docker-compose.yml
+/mise.toml
+/EVAL_LOOP.md
+/render.yaml
+node_modules
+.venv
+data
+__pycache__
+*.pyc
+.mypy_cache
+.ruff_cache
+.pytest_cache
+.git
