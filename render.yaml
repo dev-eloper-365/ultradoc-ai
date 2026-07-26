@@ -4,7 +4,7 @@ services:
     runtime: docker
     dockerfilePath: ./apps/api/Dockerfile
     dockerContext: ./apps/api
-    plan: starter
+    plan: free
     healthCheckPath: /health
     envVars:
       - key: ENV
@@ -31,7 +31,7 @@ services:
         value: INFO
       - key: LOG_FORMAT
         value: json
-    disk:
-      name: ultradoc-data
-      mountPath: /app/data
-      sizeGB: 5
+    # No persistent disk on the free plan — uploads/Chroma data live on the
+    # container's ephemeral filesystem and are wiped on every restart/redeploy.
+    # Bump plan back to "starter" (or higher) and re-add a disk block for
+    # data that needs to survive.
