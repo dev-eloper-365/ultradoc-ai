@@ -66,4 +66,52 @@
       </root>
     </mxGraphModel>
   </diagram>
+  <diagram name="Model Switch (Before vs After)" id="ultradoc-model-switch">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Before group -->
+        <mxCell id="before_group" value="First choice — deployed, then OOM'd on Render free tier" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="360" height="300" as="geometry" />
+        </mxCell>
+
+        <mxCell id="old_embed" value="mxbai-embed-large-v1&#10;1024-dim embeddings&#10;1.2 GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="110" width="320" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="old_rerank" value="jina-reranker-v1-turbo-en&#10;cross-encoder rerank&#10;156 MB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="190" width="320" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="old_total" value="= 1.36 GB of model weights on a 512MB container" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="270" width="320" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- After group -->
+        <mxCell id="after_group" value="Switched to — fits the free tier" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="680" y="60" width="360" height="300" as="geometry" />
+        </mxCell>
+
+        <mxCell id="new_embed" value="all-MiniLM-L6-v2&#10;384-dim embeddings&#10;90 MB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="700" y="110" width="320" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="new_rerank" value="ms-marco-MiniLM-L-6-v2&#10;cross-encoder rerank&#10;80 MB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="700" y="190" width="320" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="new_total" value="= 170 MB of model weights — same two-stage design kept" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2f0d9;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="270" width="320" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Transition arrow -->
+        <mxCell id="e_switch" value="512MB RAM limit hit —&#10;/upload 502'd every time&#10;(health check passed,&#10;models never loaded)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeWidth=2;dashed=1;" edge="1" parent="1" source="old_total" target="after_group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
 </mxfile>

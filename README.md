@@ -332,6 +332,29 @@ All thresholds live in `app/constants/rag.py`.
 
 ### The embedding/reranker model, and why it changed
 
+```mermaid
+flowchart LR
+    subgraph Before["❌ First choice — deployed, then OOM'd on Render free tier"]
+        direction TB
+        E1["mxbai-embed-large-v1<br/>1024-dim embeddings<br/>1.2 GB"]
+        R1["jina-reranker-v1-turbo-en<br/>cross-encoder rerank<br/>156 MB"]
+        T1["= 1.36 GB of model weights<br/>on a 512MB container"]
+        E1 --> T1
+        R1 --> T1
+    end
+
+    subgraph After["✅ Switched to — fits the free tier"]
+        direction TB
+        E2["all-MiniLM-L6-v2<br/>384-dim embeddings<br/>90 MB"]
+        R2["ms-marco-MiniLM-L-6-v2<br/>cross-encoder rerank<br/>80 MB"]
+        T2["= 170 MB of model weights<br/>same two-stage design kept"]
+        E2 --> T2
+        R2 --> T2
+    end
+
+    T1 -.->|"512MB RAM limit hit —<br/>/upload 502'd every time<br/>(health check passed, models never loaded)"| After
+```
+
 **First choice:** `mxbai-embed-large-v1` (1024-dim embeddings) +
 `jina-reranker-v1-turbo-en` (cross-encoder) — both run locally via fastembed,
 chosen for retrieval quality on the assumption that this would run on a
