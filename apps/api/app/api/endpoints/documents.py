@@ -40,9 +40,18 @@ async def get_document_file(
 ) -> FileResponse:
     """Serve a document's original bytes for inline preview — PDFs and images
     render natively in the browser; other supported types fall back to a
-    generic download content-type."""
+    generic download content-type.
+
+    Unlike ``/documents`` (a metadata listing) and ``/ask``/``/extract`` (both
+    of which fall back to unscoped access for a caller with no
+    ``X-Session-Id``, matching direct/script-caller convention), this always
+    requires a session — it serves raw original file bytes, the most
+    sensitive thing this API returns, and ``X-Session-Id`` is entirely
+    caller-supplied with no server-side verification, so treating "no header"
+    as "trusted internal caller" would let anyone fetch anyone's upload just
+    by omitting one header."""
     meta = await documents.get_document(document_id)
-    if meta is None or (session_id is not None and session_id not in meta.session_ids):
+    if meta is None or session_id is None or session_id not in meta.session_ids:
         raise create_error(
             message="Document not found",
             why="No document with that id is visible to this session",

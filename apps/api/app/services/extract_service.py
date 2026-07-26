@@ -51,11 +51,21 @@ async def extract_shipment(
 ) -> ExtractResponse:
     """Extract the structured shipment fields from one or more documents.
     ``document_ids=None`` (or empty) extracts from every document visible to
-    ``session_id`` (every uploaded document, if no session is given)."""
+    ``session_id`` (every uploaded document, if no session is given).
+
+    An explicit ``document_ids`` is intersected with what's visible to
+    ``session_id`` when a session is given — otherwise a caller could name
+    any document_id (they're just content hashes, visible in every /upload
+    response) and extract structured data out of a document some other
+    session uploaded."""
+    all_documents = await documents.list_documents(session_id=session_id)
     if document_ids:
-        resolved_ids = document_ids
+        if session_id is not None:
+            visible_ids = {entry.document_id for entry in all_documents}
+            resolved_ids = [doc_id for doc_id in document_ids if doc_id in visible_ids]
+        else:
+            resolved_ids = document_ids
     else:
-        all_documents = await documents.list_documents(session_id=session_id)
         resolved_ids = [entry.document_id for entry in all_documents]
 
     if not resolved_ids:

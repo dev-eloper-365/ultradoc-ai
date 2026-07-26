@@ -315,6 +315,14 @@ async def ask_question(
     stuck — rather than the caller picking a document up front or the answer
     being split into one block per document. See ``_SYSTEM_PROMPT``.
 
+    An explicit ``document_ids`` is intersected with what's actually visible
+    to ``session_id`` — otherwise a caller could name any document_id (they're
+    just content hashes, visible in every /upload response) and pull answers
+    out of a document some other session uploaded. This only applies when a
+    session is given; an unscoped caller (no ``X-Session-Id``) keeps today's
+    behavior of searching whatever IDs it names, same as direct/script access
+    to ``/documents`` already does.
+
     ``history`` (the client's own recent chat turns) is used to interpret
     follow-up questions — never as a source of facts.
     """
@@ -327,6 +335,17 @@ async def ask_question(
             fix="Upload a document via POST /upload first",
             status_code=404,
         )
+
+    if document_ids and session_id is not None:
+        visible_ids = {entry.document_id for entry in all_documents}
+        document_ids = [doc_id for doc_id in document_ids if doc_id in visible_ids]
+        if not document_ids:
+            raise create_error(
+                message="No documents uploaded yet",
+                why="None of the requested document_ids are visible to this session",
+                fix="Check the document_ids and X-Session-Id",
+                status_code=404,
+            )
 
     from app.config.settings import get_settings  # local import avoids a cycle
 
