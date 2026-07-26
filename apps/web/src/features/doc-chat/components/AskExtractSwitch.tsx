@@ -2,7 +2,7 @@
 
 import styled from "styled-components";
 
-export type PanelSection = "ask" | "extract";
+export type PanelSection = "ask" | "extract" | "assets";
 
 export function AskExtractSwitch({
   value,
@@ -30,6 +30,14 @@ export function AskExtractSwitch({
           onChange={() => onChange("extract")}
         />
         <label htmlFor="radio-extract">Extract</label>
+        <input
+          checked={value === "assets"}
+          id="radio-assets"
+          name="ask-extract"
+          type="radio"
+          onChange={() => onChange("assets")}
+        />
+        <label htmlFor="radio-assets">Assets</label>
         <div className="glider-container">
           <div className="glider" />
         </div>
@@ -45,7 +53,8 @@ const StyledWrapper = styled.div`
 
   .radio-container {
     --main-color: var(--color-primary);
-    --total-radio: 2;
+    --main-color-opacity: color-mix(in srgb, var(--main-color) 11%, transparent);
+    --total-radio: 3;
 
     display: flex;
     flex-direction: column;
@@ -90,20 +99,25 @@ const StyledWrapper = styled.div`
   .radio-container .glider-container .glider::before {
     content: "";
     position: absolute;
-    width: 40px;
-    height: 100%;
+    height: 60%;
+    width: 300%;
     top: 50%;
-    right: -1px;
+    right: 0;
     transform: translateY(-50%);
-    border-radius: 50%;
-    background: radial-gradient(
-      ellipse at 100% 50%,
-      color-mix(in srgb, var(--main-color) 70%, transparent) 0%,
-      color-mix(in srgb, var(--main-color) 30%, transparent) 38%,
-      transparent 75%
+    background: var(--main-color);
+    filter: blur(10px);
+  }
+  .radio-container .glider-container .glider::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    height: 100%;
+    width: 150px;
+    background: linear-gradient(
+      270deg,
+      var(--main-color-opacity) 0%,
+      rgba(0, 0, 0, 0) 100%
     );
-    opacity: 0.65;
-    filter: blur(8px);
   }
   .radio-container label {
     cursor: pointer;
@@ -127,5 +141,9 @@ const StyledWrapper = styled.div`
 
   .radio-container input:nth-of-type(2):checked ~ .glider-container .glider {
     transform: translateY(100%);
+  }
+
+  .radio-container input:nth-of-type(3):checked ~ .glider-container .glider {
+    transform: translateY(200%);
   }
 `;

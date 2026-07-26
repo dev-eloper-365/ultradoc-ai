@@ -13,12 +13,12 @@ import GridSmallBackgroundDemo from "@/components/ui/grid-small-background-demo"
 import Loader from "@/components/ui/loader";
 import type { PanelSection } from "@/features/doc-chat/components/AskExtractSwitch";
 import { AskExtractSwitch } from "@/features/doc-chat/components/AskExtractSwitch";
+import { AssetsPanel } from "@/features/doc-chat/components/AssetsPanel";
 import { ChatMessages } from "@/features/doc-chat/components/ChatMessages";
 import { Composer } from "@/features/doc-chat/components/Composer";
-import { DocumentTray } from "@/features/doc-chat/components/DocumentTray";
 import { ExtractionPanel } from "@/features/doc-chat/components/ExtractionPanel";
 import { SampleDocumentsDrawer } from "@/features/doc-chat/components/SampleDocumentsDrawer";
-import { useAskQuestion } from "@/features/doc-chat/hooks/useAskQuestion";
+import { useAskQuestion, useRegenerateLastAnswer } from "@/features/doc-chat/hooks/useAskQuestion";
 import { useHydrateDocuments } from "@/features/doc-chat/hooks/useHydrateDocuments";
 import { useUploadDocuments } from "@/features/doc-chat/hooks/useUploadDocuments";
 import { useDocStore } from "@/features/doc-chat/stores/docStore";
@@ -34,8 +34,22 @@ export default function Home() {
   const reset = useDocStore((state) => state.reset);
   const isAsking = useDocStore((state) => state.isAsking);
   const { mutate: ask } = useAskQuestion();
+  const { mutate: regenerateLastAnswer } = useRegenerateLastAnswer();
   const { mutate: upload, isPending: isUploading } = useUploadDocuments();
   const [activeSection, setActiveSection] = useState<PanelSection>("ask");
+
+  // A refresh can land while the last question never got an answer (the
+  // previous /ask call failed, e.g. a provider rate limit). Retrying it once
+  // per mount doubles as the "is the limit gone yet" check — success appends
+  // the answer, failure just re-surfaces the normal error toast.
+  const hasRetriedPendingAnswer = useRef(false);
+  useEffect(() => {
+    if (hasRetriedPendingAnswer.current) return;
+    const last = messages[messages.length - 1];
+    if (!last || last.role !== "user" || isAsking) return;
+    hasRetriedPendingAnswer.current = true;
+    regenerateLastAnswer();
+  }, [messages, isAsking, regenerateLastAnswer]);
 
   // Local uploads can resolve in well under 100ms, which flashes the loader
   // for an imperceptible instant. Hold it visible for a minimum stretch once
@@ -168,20 +182,7 @@ export default function Home() {
         ) : (
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden pt-4">
             <div className="flex min-h-0 flex-1 gap-4 overflow-hidden">
-              <aside className="relative flex min-h-0 w-72 shrink-0 flex-col gap-3 overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-3 shadow-[0_0_40px_-16px_var(--color-primary)] backdrop-blur-2xl">
-                <GlowingEffect
-                  spread={80}
-                  glow
-                  disabled={false}
-                  proximity={48}
-                  inactiveZone={0.01}
-                  borderWidth={2}
-                />
-                <DocumentTray onStartOver={reset} />
-                <div className="shrink-0 border-t border-white/10 pt-2">
-                  <AskExtractSwitch value={activeSection} onChange={setActiveSection} />
-                </div>
-              </aside>
+              <AskExtractSwitch value={activeSection} onChange={setActiveSection} />
 
               <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
                 <Fireflies className="h-[60vh] min-h-1/2" />
@@ -194,7 +195,13 @@ export default function Home() {
                     transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                     className="flex h-full min-h-0 flex-col"
                   >
-                    {activeSection === "ask" ? <ChatMessages /> : <ExtractionPanel />}
+                    {activeSection === "ask" ? (
+                      <ChatMessages />
+                    ) : activeSection === "extract" ? (
+                      <ExtractionPanel />
+                    ) : (
+                      <AssetsPanel onStartOver={reset} />
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </div>
