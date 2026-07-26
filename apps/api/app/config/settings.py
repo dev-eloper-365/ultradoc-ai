@@ -29,8 +29,12 @@ class Settings(BaseSettings):
     LLM_MODEL: str = DEFAULT_LLM_MODEL
 
     # Embeddings — local fastembed models, no cloud key required.
-    EMBEDDING_MODEL: str = "mixedbread-ai/mxbai-embed-large-v1"
-    RERANKER_MODEL: str = "jinaai/jina-reranker-v1-turbo-en"
+    # Small fastembed-native models — fits Render's free 512MB tier (1.2GB +
+    # 156MB for mxbai-embed-large + jina-turbo blew way past it). ~170MB
+    # combined vs ~1.36GB before. Confidence thresholds in constants/rag.py
+    # are recalibrated for these models' score distributions.
+    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
+    RERANKER_MODEL: str = "Xenova/ms-marco-MiniLM-L-6-v2"
     MODEL_CACHE_DIR: str | None = "data/models"
 
     # Storage

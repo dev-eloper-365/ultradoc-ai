@@ -20,8 +20,19 @@ RERANK_BLEND_WEIGHT = 0.6  # weight of cross-encoder rerank vs. raw cosine
 
 # A chunk is "confident" (trusted evidence) if either signal alone clears its
 # bar — the two disagree often enough that requiring both misses real hits.
-CONFIDENT_COSINE = 0.55
-CONFIDENT_RERANK_LOGIT = -2.5
+#
+# Recalibrated for the smaller EMBEDDING_MODEL/RERANKER_MODEL (all-MiniLM-L6-v2
+# + ms-marco-MiniLM-L-6-v2, swapped in to fit Render's free 512MB tier — the
+# original mxbai-embed-large-v1 + jina-reranker-v1-turbo-en pair alone was
+# 1.36GB). These smaller models produce a materially different, more
+# compressed raw-score range: on a known-correct single-fact query, cosine
+# topped out at 0.24 (old threshold 0.55 — nothing would ever clear it) and
+# reranker logits clustered at -5.8 to -6.0 for genuinely relevant chunks vs.
+# -11 for irrelevant ones (old threshold -2.5 — same problem). Thresholds
+# below sit just past the relevant cluster on that real sample; revisit with
+# a broader eval batch if confidence tiers still read miscalibrated.
+CONFIDENT_COSINE = 0.20
+CONFIDENT_RERANK_LOGIT = -7.0
 
 MAX_WEAK_RESULTS = 4  # cap on non-confident chunks kept alongside confident ones
 

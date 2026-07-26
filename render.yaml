@@ -18,9 +18,9 @@ services:
       - key: LLM_MODEL
         value: llama-3.3-70b-versatile
       - key: EMBEDDING_MODEL
-        value: mixedbread-ai/mxbai-embed-large-v1
+        value: sentence-transformers/all-MiniLM-L6-v2
       - key: RERANKER_MODEL
-        value: jinaai/jina-reranker-v1-turbo-en
+        value: Xenova/ms-marco-MiniLM-L-6-v2
       - key: MODEL_CACHE_DIR
         value: /app/data/models
       - key: DATA_DIR
