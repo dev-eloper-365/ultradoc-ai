@@ -55,7 +55,26 @@ _SYSTEM_PROMPT = (
     "reads 'N/A', the correct answer is 'Class: N/A' — NOT 'Not found in "
     "document.'; the not-found message is reserved for when the field or "
     "fact is genuinely absent from the context, never for a field that's "
-    "present with an explicit empty/NA value. Documents often "
+    "present with an explicit empty/NA value. "
+    "One narrow, deliberate exception to 'no outside knowledge': a question "
+    "asking what an abbreviation/code/acronym that APPEARS IN CONTEXT stands "
+    "for or means (e.g. 'What is MC?', 'What does COD stand for?', 'What is "
+    "RC?') — unlike every other kind of fact, the plain-English expansion of "
+    "a standard abbreviation is general terminology, not a claim about this "
+    "shipment. Handle every such question the same way, consistently: (1) if "
+    "the abbreviation labels a value in CONTEXT, give that value first, "
+    "verbatim; (2) give the general industry meaning of the abbreviation "
+    "itself, clearly framed as general terminology and not as something the "
+    "document states — e.g. 'MC1685682 — MC here is the carrier's Motor "
+    "Carrier number, a standard trucking-industry ID' or, when only the bare "
+    "term is asked with no value attached, 'RC commonly stands for Rate "
+    "Confirmation in logistics paperwork (matches the document title here, "
+    "\"Carrier Rate and Load Confirmation\").' Never refuse this kind of "
+    "question just because the expansion text itself doesn't appear "
+    "verbatim in CONTEXT — only refuse it if the abbreviation doesn't appear "
+    "in CONTEXT at all. This exception covers ONLY expanding a term that's "
+    "actually present in CONTEXT; it never licenses adding outside facts "
+    "about the shipment itself. Documents often "
     "have more than one section with a similar name (e.g. a labeled line "
     "like 'carrier instructions: ...' with real content, AND a separately "
     "titled section like 'Test RC Instructions' that's just placeholder "
@@ -196,12 +215,20 @@ def _build_prompt(question: str, chunks: list[RetrievedChunk], history: list[His
 
 
 def _refusal_response(*, model: str, retrieval_score: float) -> AskResponse:
+    # confidence_tier is deliberately always "low" here, never derived from
+    # retrieval_score via _tier() — retrieval_score measures topic/keyword
+    # similarity, not confidence in an answer, and a refusal has no answer to
+    # be confident about. A topically-close-but-unanswerable question (high
+    # retrieval score, still refused) must never surface as "high confidence"
+    # next to "Not found in document." The raw score is kept in
+    # confidence/confidence_breakdown for transparency (e.g. the UI's "Why?"
+    # breakdown), just not promoted to the headline tier.
     return AskResponse(
         answer=REFUSAL_MESSAGE,
         refused=True,
         sources=[],
         confidence=round(retrieval_score, 3),
-        confidence_tier=_tier(retrieval_score),
+        confidence_tier="low",
         confidence_breakdown=ConfidenceBreakdown(
             retrieval=round(retrieval_score, 3), agreement=0.0, grounding=0.0
         ),
